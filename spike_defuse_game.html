@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爆能器拆除</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: white;
+        }
+        #progress-bar {
+            width: 80%;
+            height: 30px;
+            background: gray;
+            margin: 20px auto;
+            border-radius: 5px;
+            position: relative;
+        }
+        #progress {
+            width: 0%;
+            height: 100%;
+            background: limegreen;
+            border-radius: 5px;
+            transition: width 0.1s;
+        }
+        #message {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+        #defuse-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #spike {
+            width: 100px;
+            height: 100px;
+            background: url('https://i.imgur.com/6YI5vYg.png') no-repeat center;
+            background-size: cover;
+            margin: 20px auto;
+            animation: pulse 1s infinite alternate;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.1); opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+    <h1>拆除爆能器</h1>
+    <div id="spike"></div>
+    <div id="progress-bar">
+        <div id="progress"></div>
+    </div>
+    <button id="defuse-button">按住拆除</button>
+    <p id="message">按住按钮进行拆除</p>
+
+    <script>
+        let progress = 0;
+        let interval;
+        let defusing = false;
+        let firstHalfCompleted = false;
+        const progressBar = document.getElementById("progress");
+        const message = document.getElementById("message");
+        const button = document.getElementById("defuse-button");
+        const spike = document.getElementById("spike");
+
+        button.addEventListener("mousedown", startDefuse);
+        button.addEventListener("touchstart", startDefuse);
+        button.addEventListener("mouseup", stopDefuse);
+        button.addEventListener("mouseleave", stopDefuse);
+        button.addEventListener("touchend", stopDefuse);
+
+        function startDefuse() {
+            if (defusing) return;
+            defusing = true;
+            message.innerText = "拆除中...";
+            spike.style.animation = "none";
+            interval = setInterval(() => {
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    message.innerText = "拆除成功！";
+                    button.style.display = "none";
+                    spike.style.opacity = "0.5";
+                    return;
+                }
+                progress += 100 / 70; // 7秒完成
+                if (progress >= 50) firstHalfCompleted = true;
+                progressBar.style.width = `${progress}%`;
+            }, 100);
+        }
+
+        function stopDefuse() {
+            if (!defusing) return;
+            defusing = false;
+            clearInterval(interval);
+            if (!firstHalfCompleted) {
+                progress = 0;
+            }
+            message.innerText = "按住按钮进行拆除";
+            progressBar.style.width = `${progress}%`;
+            spike.style.animation = "pulse 1s infinite alternate";
+        }
+    </script>
+</body>
+</html>
